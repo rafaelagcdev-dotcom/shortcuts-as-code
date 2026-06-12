@@ -119,6 +119,52 @@ workflow = {
 plistlib.dump(workflow, open("Car Mode.shortcut", "wb"))
 ```
 
+### A second example: composing with a *harvested reference*
+
+Some action parameters aren't text you can type — they're opaque references
+into an app's internal state. "Play Podcast" is the clearest case: it stores the
+show as a `WFPodcastShow` object (a `podcastUUID`, `feedUrl`, `collectionId`),
+not the show's name. You cannot write this by hand; you have to harvest it from a
+shortcut where you already picked the show in the UI.
+
+Here a "commute mode" shortcut plays a news podcast and opens the browser — the
+podcast reference is exactly what `harvest.py` pulled from a donor:
+
+```python
+import plistlib, uuid
+U = lambda: str(uuid.uuid4()).upper()
+
+play_podcast = {"WFWorkflowActionIdentifier": "is.workflow.actions.playpodcast",
+    "WFWorkflowActionParameters": {"UUID": U(),
+        # ↓ harvested, not typed — copy the whole object from harvest.py output
+        "WFPodcastShow": {"podcastUUID": "20050B6A-787C-4211-B051-EA94DF617CCD",
+            "kind": "podcast", "collectionName": "Actualidad iPhone",
+            "feedUrl": "https://www.actualidadiphone.com/feed/podcast/",
+            "collectionId": "483667756"}}}
+
+open_browser = {"WFWorkflowActionIdentifier": "is.workflow.actions.openapp",
+    "WFWorkflowActionParameters": {"UUID": U(),
+        "WFAppIdentifier": "com.apple.mobilesafari",
+        "WFSelectedApp": {"BundleIdentifier": "com.apple.mobilesafari", "Name": "Safari"}}}
+
+workflow = {
+    "WFWorkflowActions": [play_podcast, open_browser],
+    "WFWorkflowClientVersion": "2607.1.3",
+    "WFWorkflowMinimumClientVersion": 900,
+    "WFWorkflowMinimumClientVersionString": "900",
+    "WFWorkflowIcon": {"WFWorkflowIconStartColor": 4282601983,
+                       "WFWorkflowIconGlyphNumber": 59729},
+    "WFWorkflowImportQuestions": [], "WFWorkflowTypes": [], "WFQuickActionSurfaces": [],
+    "WFWorkflowHasShortcutInputVariables": False,
+    "WFWorkflowInputContentItemClasses": ["WFAppContentItem", "WFStringContentItem"],
+}
+plistlib.dump(workflow, open("Commute Mode.shortcut", "wb"))
+```
+
+To target a different show, don't edit the fields above by hand — make a one-action
+donor that plays *your* podcast, run `harvest.py` on it, and paste the whole
+`WFPodcastShow` object. That's the workflow: pick in the UI once, harvest, reuse.
+
 ## Step 3 — Sign
 
 ```bash
