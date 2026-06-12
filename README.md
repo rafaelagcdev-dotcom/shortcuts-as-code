@@ -11,6 +11,41 @@ It turns out you can close that gap with four moving parts, none of which requir
 
 I used this to generate, from a chat session with an AI agent on my Mac, a working iPhone shortcut that pauses my car stereo's auto-play and opens Waze when my phone connects to the car's Bluetooth. No editor involved.
 
+## Try it (reproducible demo)
+
+macOS, Python 3. Each example is its own self-contained composer — no framework,
+no build step.
+
+```bash
+git clone https://github.com/rafaelagcdev-dotcom/shortcuts-as-code
+cd shortcuts-as-code
+
+python examples/car-mode.py          # writes "Car Mode.shortcut"
+./tools/sign.sh "Car Mode.shortcut"  # -> signed/Car Mode.shortcut
+open "signed/Car Mode.shortcut"       # one-click import; iCloud syncs it
+```
+
+That's the whole loop: **compose → sign → import**. To clone an action you don't
+have a definition for, harvest it first:
+
+```bash
+./tools/harvest.py https://www.icloud.com/shortcuts/<id>
+```
+
+Repo layout:
+
+```
+examples/   self-contained composers (car-mode.py, commute-mode.py)
+tools/      harvest.py (extract actions from a donor) + sign.sh (wrap shortcuts sign)
+docs/       donor-shortcuts.md (how to harvest what you can't hand-write)
+```
+
+There is deliberately **no generic compose.py / YAML→plist compiler** — that is
+what [Cherri](https://cherrilang.org/) already does. Here each example *is* its
+own composer: explicit, verifiable, easy to read.
+
+The rest of this README explains the four steps in detail.
+
 ## Why harvesting beats a static action catalog
 
 Projects like [Cherri](https://cherrilang.org/) and the older [shortcuts-js](https://github.com/joshfarrant/shortcuts-js) compile code into shortcuts using a built-in catalog of action definitions. That works until you need an action they haven't catalogued — especially the modern **App Intents** that apps expose (Clock, Home, third-party apps), which change with every iOS release and are undocumented.
@@ -31,12 +66,12 @@ curl -s "$URL" -o donor.plist
 
 That's the **unsigned** plist — the same endpoint Apple's own web preview uses, serving content its owner chose to share.
 
-The repo ships [`harvest.py`](harvest.py), which wraps the steps above into one command:
+The repo ships [`tools/harvest.py`](tools/harvest.py), which wraps the steps above into one command:
 
 ```bash
-./harvest.py https://www.icloud.com/shortcuts/<ID>   # list actions, parameters truncated
-./harvest.py <ID> --full                             # full parameters
-./harvest.py <ID> --json                             # machine-readable
+./tools/harvest.py https://www.icloud.com/shortcuts/<ID>   # list actions, parameters truncated
+./tools/harvest.py <ID> --full                             # full parameters
+./tools/harvest.py <ID> --json                             # machine-readable
 ```
 
 Output for a donor containing the Clock app's alarm actions:

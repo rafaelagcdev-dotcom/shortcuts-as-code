@@ -1,0 +1,6 @@
+# generated artifacts
+*.shortcut
+signed/
+record.json
+donor.plist
+__pycache__/
