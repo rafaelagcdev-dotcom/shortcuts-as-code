@@ -11,7 +11,7 @@ It turns out you can close that gap with four moving parts, none of which requir
 
 I used this to generate, from a chat session with an AI agent on my Mac, a working iPhone shortcut that pauses my car stereo's auto-play and opens Waze when my phone connects to the car's Bluetooth. No editor involved.
 
-## Try it (reproducible demo)
+## Quick start
 
 macOS, Python 3. Each example is its own self-contained composer — no framework,
 no build step.
@@ -20,9 +20,9 @@ no build step.
 git clone https://github.com/rafaelagcdev-dotcom/shortcuts-as-code
 cd shortcuts-as-code
 
-python examples/car-mode.py          # writes "Car Mode.shortcut"
-./tools/sign.sh "Car Mode.shortcut"  # -> signed/Car Mode.shortcut
-open "signed/Car Mode.shortcut"       # one-click import; iCloud syncs it
+python3 examples/car-mode.py          # writes "Car Mode.shortcut"
+./tools/sign.sh "Car Mode.shortcut"   # -> signed/Car Mode.shortcut
+open "signed/Car Mode.shortcut"        # one-click import; iCloud syncs it
 ```
 
 That's the whole loop: **compose → sign → import**. To clone an action you don't
