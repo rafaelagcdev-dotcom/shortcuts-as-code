@@ -29,7 +29,30 @@ URL=$(python3 -c "import json;print(json.load(open('record.json'))['fields']['sh
 curl -s "$URL" -o donor.plist
 ```
 
-That's the **unsigned** plist — the same endpoint Apple's own web preview uses, serving content its owner chose to share. Inspect it:
+That's the **unsigned** plist — the same endpoint Apple's own web preview uses, serving content its owner chose to share.
+
+The repo ships [`harvest.py`](harvest.py), which wraps the steps above into one command:
+
+```bash
+./harvest.py https://www.icloud.com/shortcuts/<ID>   # list actions, parameters truncated
+./harvest.py <ID> --full                             # full parameters
+./harvest.py <ID> --json                             # machine-readable
+```
+
+Output for a donor containing the Clock app's alarm actions:
+
+```
+# Eliminar alarmas — 2 action(s)
+
+[0] com.apple.mobiletimer-framework.MobileTimerIntents.MTGetAlarmsIntent
+    {"WFContentItemFilter": ...}
+[1] com.apple.mobiletimer.DeleteAlarmIntent
+    {...}
+```
+
+This is the one piece a static catalog can't give you: **any action that exists on your own device** can be cloned exactly as your iOS version serializes it — including App Intents no project has catalogued. The rest of the pipeline (compose/sign/import) is below; for the compose step a mature option is [Cherri](https://cherrilang.org/).
+
+Or do it inline:
 
 ```python
 import plistlib, json
