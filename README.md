@@ -1,5 +1,9 @@
 # Apple Shortcuts as code: harvest, compose, sign, import
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Platform: macOS](https://img.shields.io/badge/platform-macOS-lightgrey.svg)
+![Apple Shortcuts](https://img.shields.io/badge/Apple-Shortcuts-blue.svg)
+
 Apple Shortcuts has no public API for *creating* shortcuts. The macOS `shortcuts` CLI can run, list and sign them — but not build them. The official path is dragging actions in the editor, one by one, which doesn't scale and can't be automated.
 
 It turns out you can close that gap with four moving parts, none of which require a jailbreak, a developer account, or breaking any protection:
@@ -40,9 +44,17 @@ tools/      harvest.py (extract actions from a donor) + sign.sh (wrap shortcuts 
 docs/       donor-shortcuts.md (how to harvest what you can't hand-write)
 ```
 
-There is deliberately **no generic compose.py / YAML→plist compiler** — that is
-what [Cherri](https://cherrilang.org/) already does. Here each example *is* its
-own composer: explicit, verifiable, easy to read.
+## What this is / what this is not
+
+**This is** a minimal, reproducible workflow for generating *concrete* Apple
+Shortcuts from code — clone, run an example, sign, import. The `examples/*.py`
+are intentionally explicit composers for real shortcuts.
+
+**This is not** a generic YAML→shortcut compiler, a DSL, or a templating system,
+and it isn't trying to replace [Cherri](https://cherrilang.org/) or
+[shortcuts-js](https://github.com/joshfarrant/shortcuts-js). Those compile from a
+catalog; this repo's contribution is the *harvesting* step and a couple of honest,
+end-to-end examples. No `compose.py`, on purpose — that path is a black hole.
 
 The rest of this README explains the four steps in detail.
 
